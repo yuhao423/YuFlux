@@ -1,0 +1,22 @@
+{
+  "name": "yu-Flux",
+  "private":"true",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint --fix --cache --ext .js,.ts src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.1",
+    "@typescript-eslint/eslint-plugin": "^7.12.0",
+    "@typescript-eslint/parser": "^7.12.0",
+    "eslint": "8.55.0",
+    "eslint-plugin-import": "^2.29.1",
+    "typescript": "^5.4.5"
+  }
+}
