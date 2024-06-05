@@ -1,4 +1,6 @@
-'use strict'
-const a:number = 3;
+"use strict";
+const a: number = 3;
 console.log(a);
 
+const sdf = 1;
+const wefwe = 112;
