@@ -1,7 +1,8 @@
 "use strict";
 const a: number = 3;
-console.log(a);
+const map = new Map()
+map.set('s',a)
 
-const sdf = 1;
-const wefwe = 112;
-console.log("test111");
+// const sdf = 1;
+// const wefwe = 112;
+

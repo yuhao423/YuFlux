@@ -1,24 +1,26 @@
 // @ts-check
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import chalk from "chalk";
+const {readFileSync} = require('fs')
+const path = require('path')
+const colors = require('colors')
 
 const msgPath = path.resolve(".git/COMMIT_EDITMSG");
+// const msgPath = process.env.GIT_PARAMS;
+// @ts-ignore
 const msg = readFileSync(msgPath, "utf-8").trim();
 
 const commitRE =
-  /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?: .{1,50}/;
-
+  /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?: .{1,100}/;
+console.log(commitRE.test(msg),msg,'msg');
 if (!commitRE.test(msg)) {
-  console.log(33333);
+  console.log();
   console.error(
-    `  ${chalk.bgRed.white(" ERROR ")} ${chalk.red(
+    `  ${colors.bgRed.white(" ERROR ")} ${colors.red(
       "invalid commit message format.",
-    )}\n\n${chalk.red(
+    )}\n\n${colors.red(
       "  Proper commit message format is required for automated changelog generation. Examples:\n\n",
-    )}    ${chalk.green("feat(compiler): add 'comments' option")}\n` +
-      `    ${chalk.green("fix(v-model): handle events on blur (close #28)")}\n\n${chalk.red(
-        "  See .github/commit-convention.md for more details.\n",
+    )}    ${colors.green("feat(compiler): add 'comments' option")}\n` +
+      `    ${colors.green("fix(v-model): handle events on blur (close #28)")}\n\n${colors.red(
+        "  ont of commit must start with feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release.\n",
       )}`,
   );
   process.exit(1);
