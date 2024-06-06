@@ -5,10 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint --ext .ts,.js,cjs, src/ --fix",
+    "lint": "eslint --ext .ts,.js,cjs src/ --fix",
     "format": "prettier --write \"src/*.{ts,js,cjs,mjs,json}\"",
     "typecheck": "tsc --noEmit",
-    "lint:ci": "eslint .ts,.js,cjs, src/",
+    "lint:ci": "eslint .ts,.js,cjs src/",
     "format:ci": "prettier --list-different \"src/*.{ts,js,cjs,mjs,json}\""
   },
   "keywords": [],
