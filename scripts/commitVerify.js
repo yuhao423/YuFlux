@@ -1,7 +1,7 @@
 // @ts-check
-const {readFileSync} = require('fs')
-const path = require('path')
-const colors = require('colors')
+const { readFileSync } = require("fs");
+const path = require("path");
+const colors = require("colors");
 
 const msgPath = path.resolve(".git/COMMIT_EDITMSG");
 // const msgPath = process.env.GIT_PARAMS;
@@ -10,7 +10,7 @@ const msg = readFileSync(msgPath, "utf-8").trim();
 
 const commitRE =
   /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?: .{1,100}/;
-console.log(commitRE.test(msg),msg,'msg');
+console.log(commitRE.test(msg), msg, "msg");
 if (!commitRE.test(msg)) {
   console.log();
   console.error(

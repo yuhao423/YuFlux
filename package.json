@@ -31,6 +31,9 @@
     "preserveUnused": true
   },
   "lint-staged": {
-    "*.{js,ts,cjs}": "pnpm lint"
+    "*.{js,ts,cjs}": [
+      "pnpm lint",
+      "pnpm format"
+    ]
   }
 }
