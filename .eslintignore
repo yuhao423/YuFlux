@@ -6,3 +6,13 @@ rollup.config.js
 commitlint.config.js
 packages/*/dist/
 apps/
+scripts/
+
+# 忽略 package.json 文件  
+package.json  
+  
+# 忽略 pnpm-lock.yaml 文件  
+pnpm-lock.yaml  
+  
+# 忽略 readme.md 文件  
+readme.md 
