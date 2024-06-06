@@ -6,10 +6,10 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint --ext .ts,.js,cjs, src/ --fix",
-    "format": "prettier --write \"**/*.{ts,js,cjs,mjs,json}\"",
+    "format": "prettier --write \"src/*.{ts,js,cjs,mjs,json}\"",
     "typecheck": "tsc --noEmit",
     "lint:ci": "eslint .ts,.js,cjs, src/",
-    "format:ci": "prettier --list-different \"**/*.{ts,js,cjs,mjs,json}\""
+    "format:ci": "prettier --list-different \"src/*.{ts,js,cjs,mjs,json}\""
   },
   "keywords": [],
   "author": "",
