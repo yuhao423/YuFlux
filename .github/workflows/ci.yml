@@ -1,0 +1,40 @@
+name: CI
+
+on:
+   push:
+     branches:
+        - master
+   pull_request:
+     types: [opened,synchronize,reopened]
+     branches:
+        - master
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            node-version: [18]
+        steps:
+          - name: Checkout 🛎️
+            uses: actions/checkout@v3
+            with:
+              persist-credentials: false
+    
+          - name: Install PNPM
+            uses: pnpm/action-setup@v2
+            with:
+              version: ^8.0
+    
+          - name: Install Deps
+            run: pnpm i --no-frozen-lockfile
+    
+          - name: Format
+            run: |
+              pnpm run format:ci
+    
+          - name: Lint
+            run: pnpm run lint:ci
+
+          - name: TypeScript Check
+            run: pnpm tsc --noEmit
