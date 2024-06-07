@@ -2,13 +2,13 @@
 
 ### 1. 基本工程化
 1. eslint   √
-2. typescript   √
+2. typescript及tsc检查   √
 3. 打包配置   rollup    ×
 4. prettier  代码格式化，与eslint有冲突，需要额外依赖  √
-5. commit,husky 规范    ×
+5. commit,husky 规范    √
 6. mit开源管理  ×
 7. npm源管理    √
-
+8. ci pr时候进行检测等等  ×
 
 ##### simple-git-hooks
 本人`git`垃圾，决定采用`simple-git-hooks`来规范 git ，轻量，简洁，快速上手，感觉比`cz`好用。
