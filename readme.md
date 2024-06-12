@@ -8,7 +8,7 @@
 5. commit,husky 规范    √
 6. mit开源管理  ×
 7. npm源管理    √
-8. ci pr时候进行检测等等  ×
+8. ci pr时候进行检测等等  √
 
 ##### simple-git-hooks
 本人`git`垃圾，决定采用`simple-git-hooks`来规范 git ，轻量，简洁，快速上手，感觉比`cz`好用。

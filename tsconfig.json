@@ -17,7 +17,7 @@
     "noImplicitAny": false, // 是否默认禁用 any
     "removeComments": true, // 是否移除注释
     "forceConsistentCasingInFileNames": true, //禁止对同一个文件的不一致的引用。
-    "types": [],
+    "types": ["node"],//加入node
     "target": "ES5", // 编译成什么版本
     "module": "CommonJS", // 当前代码语法
     "declaration": false, // 是否自动创建类型声明文件
