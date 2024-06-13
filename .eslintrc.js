@@ -30,7 +30,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": 0,
     "no-multiple-empty-lines": ["error", { max: 1 }],
     "no-var": 2, // 禁止使用 var 声明变量
-    "no-console": 2, //禁止使用 console
+    "no-console": ["error",{ "allow": ["warn", "error"]}], //禁止使用 console.log
     "prefer-rest-params": 2, // 要求使用剩余参数而不是 arguments
     eqeqeq: 2, // 强制使用 === 和 !==
     "no-multi-spaces": 1, // 禁止使用多个空格
