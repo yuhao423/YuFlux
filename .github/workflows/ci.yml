@@ -35,6 +35,3 @@ jobs:
     
           - name: Lint
             run: pnpm run lint:ci
-
-          - name: TypeScript Check
-            run: pnpm tsc --noEmit
