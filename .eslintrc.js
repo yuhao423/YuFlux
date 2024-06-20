@@ -2,8 +2,9 @@ module.exports = {
   env: {
     node: true,
     jest: true,
+    es6: true,
   },
-  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  extends: ["eslint:recommended", "prettier"],
   overrides: [
     {
       env: {
@@ -15,19 +16,20 @@ module.exports = {
       },
     },
   ],
-  parser: "@typescript-eslint/parser",
+  // parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: "tsconfig.json",
-    tsconfigRootDir: __dirname,
-    sourceType: "module",
+    // project: "tsconfig.json",
+    // tsconfigRootDir: __dirname,
+    // sourceType: "module",
+    ecmaVersion: 2020, // 支持最新的 ECMAScript 特性
   },
-  plugins: ["@typescript-eslint", "import"],
+  plugins: ["import"],
   rules: {
     "no-unused-vars": "off",
-    "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    // "@typescript-eslint/no-var-requires": "off",
+    // "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "no-undef": 0,
-    "@typescript-eslint/no-explicit-any": 0,
+    // "@typescript-eslint/no-explicit-any": 0,
     "no-multiple-empty-lines": ["error", { max: 1 }],
     "no-var": 2, // 禁止使用 var 声明变量
     "no-console": ["error",{ "allow": ["warn", "error"]}], //禁止使用 console.log

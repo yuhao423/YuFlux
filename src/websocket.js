@@ -1,54 +1,34 @@
-/* eslint no-unused-vars: ["error", { "varsIgnorePattern": "^Duplex|Readable$", "caughtErrors": "none" }] */
+const http = require("http");
+const EventEmitter = require("events");
+const { URL } = require("url");
+const { randomBytes } = require("crypto");
 
-import { URL } from "url";
-import EventEmitter from "events";
-import { randomBytes } from "crypto";
-import http from "http";
+const { protocolVersions, readyStates } = require("./constant");
 
-import { InitOptions, protocolVersions } from "./constant";
-import { ReadyState } from "./constant";
-
-const kAborted = Symbol("kAborted");
-
-class Websocket extends EventEmitter {
-  _isServer: boolean;
-  _redirects: number;
-  _url: string;
-  _autoPong: boolean;
-  _req: http.ClientRequest | null;
-  _readyState: ReadyState;
-  constructor(address: URL | null, protocols: string[] | null, options: unknown) {
+class YuFlux extends EventEmitter {
+  constructor(address, protocols, options) {
     super();
-    this._readyState = "CONNECTING";
-    //给options一些默认值
+    this._readyState = readyStates[0];
 
-    if (address !== null) {
+    if (address !== undefined) {
       this._isServer = false;
-      this._redirects = 0;
+      this._redirect = 0;
 
-      //处理子协议
       if (protocols === undefined || null) {
         protocols = [];
       }
 
-      //主函数，init websocket
-      initSocketClient(this, address, protocols, options);
+      initWebSocketClient(this, address, protocols, options);
     } else {
       this._isServer = true;
     }
   }
 }
-module.exports = Websocket;
 
-function initSocketClient(
-  websocket: Websocket,
-  address: URL,
-  protocols: string[],
-  options: InitOptions,
-) {
-  //1.处理协议 protocolVersion，必须是 8 或者13，w我们使用13
+module.exports = YuFlux;
 
-  const opts: Record<string, any> = {
+const initWebSocketClient = (websocket, address, protocols, options) => {
+  const opts = {
     //给options一些默认值
     autoPong: true,
     protocolVersion: protocolVersions[0],
@@ -70,43 +50,44 @@ function initSocketClient(
     path: undefined,
     port: undefined,
   };
+
   websocket._autoPong = opts.autoPong;
+
   //协议不是 8 或者 13
   if (!protocolVersions.includes(opts.protocolVersion)) {
     throw new Error("协议错误,你配置对象中的protocolVersion应该为13");
   }
 
-  //处理url路径的问题
-  let parseUrl: URL;
-
+  let parseUrl;
   if (address instanceof URL) {
     parseUrl = address;
   } else {
     try {
       parseUrl = new URL(address);
-    } catch (e) {
+    } catch (error) {
       throw new Error(`不正确的url,${address}`);
     }
   }
 
   //路径必须是wss或者ws，这里我们可以将http，https转化成wss，ws，方便用户交互。
-  if (parseUrl.protocol === "https") {
-    parseUrl.protocol = "wss";
-  } else if (parseUrl.protocol === "http") {
-    parseUrl.protocol = "ws";
+  if (parseUrl.protocol === "https:") {
+    parseUrl.protocol = "wss:";
+  } else if (parseUrl.protocol === "http:") {
+    parseUrl.protocol = "ws:";
   }
+
   //完整的url给 websocket_url
   websocket._url = parseUrl.href;
-  const isSecure: boolean = parseUrl.protocol === "wss" ? true : false;
+
+  const isSecure = parseUrl.protocol === "wss:" ? true : false;
   //todo 考虑是不是wss，因为要使用tsl
   let invalidUrlMessage;
-  if (parseUrl.protocol !== "wss" && parseUrl.protocol !== "ws") {
+  if (parseUrl.protocol !== "wss:" && parseUrl.protocol !== "ws:") {
     invalidUrlMessage = "不正确的url，websocket支持";
   }
   if (invalidUrlMessage) {
     throw invalidUrlMessage;
   }
-
   //处理简单加密的Sec-WebSocket-Key，用于提供基本的防护, 比如无意的连接
   const key = randomBytes(16).toString("base64");
   //发送http请求，使用http模块的request
@@ -146,8 +127,7 @@ function initSocketClient(
     opts.auth = `${parseUrl.username}:${parseUrl.password}`;
   }
 
-  let req: http.ClientRequest | null;
-
+  let req;
   //todo 处理重定向
   if (opts.followRedirects) {
     /* eslint-enable no-console */
@@ -155,32 +135,24 @@ function initSocketClient(
     /* eslint-enable no-console */
     // ...
   }
+
   req = websocket._req = request(opts);
 
-  //握手超时时间
   if (opts.timeout) {
-    req.on("timeout", () => {
+    req("timeout", () => {
       //这里不能简单的抛出，一定要断开连接并抛出错误
       abortHandshake(websocket, req, "握手超时了");
     });
   }
-}
 
-//中断握手
-function abortHandshake(websocket: Websocket, stream: http.ClientRequest, message: string) {
-  //1. 将内部的状态设置为正在关闭中
-  websocket._readyState = "CLOSING";
+  //error
+  req("error", () => {
+    req = websocket._req = null;
 
-  const err = new Error(message);
-  Error.captureStackTrace(err, abortHandshake);
+    emitErrorAndClose();
+  });
 
-  //如果是http
-  if (stream.setHeader) {
-    stream[kAborted] = true;
-    stream.abort();
+  //todo respose 重定向
 
-    stream.destroy();
-
-    // process.nextTick(emitErrorAndClose, websocket, err);
-  }
-}
+  req("upgrade", (res, socket, head) => {});
+};
