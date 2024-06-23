@@ -139,14 +139,14 @@ const initWebSocketClient = (websocket, address, protocols, options) => {
   req = websocket._req = request(opts);
 
   if (opts.timeout) {
-    req("timeout", () => {
+    req.on("timeout", () => {
       //这里不能简单的抛出，一定要断开连接并抛出错误
       abortHandshake(websocket, req, "握手超时了");
     });
   }
 
   //error
-  req("error", () => {
+  req.on("error", (err) => {
     req = websocket._req = null;
 
     emitErrorAndClose();
@@ -154,5 +154,18 @@ const initWebSocketClient = (websocket, address, protocols, options) => {
 
   //todo respose 重定向
 
-  req("upgrade", (res, socket, head) => {});
+  req.on("upgrade", (res, socket, head) => {
+    websocket.emit("upgrade", res);
+  });
+
+  if (opts.finishRequest) {
+    opts.finishRequest(req, websocket);
+  } else {
+    req.end();
+  }
+};
+
+//todo 完善 emitErrorAndClose 函数
+const emitErrorAndClose = (err) => {
+  console.error(err, "err");
 };
