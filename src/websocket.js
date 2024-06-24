@@ -1,9 +1,9 @@
 const http = require("http");
 const EventEmitter = require("events");
 const { URL } = require("url");
-const { randomBytes } = require("crypto");
+const { randomBytes, createHash } = require("crypto");
 
-const { protocolVersions, readyStates } = require("./constant");
+const { protocolVersions, readyStates, GUID } = require("./constant");
 
 class YuFlux extends EventEmitter {
   constructor(address, protocols, options) {
@@ -13,7 +13,9 @@ class YuFlux extends EventEmitter {
     if (address !== undefined) {
       this._isServer = false;
       this._redirect = 0;
-
+      // 加入socket，tcp
+      this._socket = null;
+      this._protocol = "";
       if (protocols === undefined || null) {
         protocols = [];
       }
@@ -23,6 +25,18 @@ class YuFlux extends EventEmitter {
       this._isServer = true;
     }
   }
+
+  /**
+   * @private
+   */
+  emitClose() {}
+
+  /**
+   * @param {Duplex} socket
+   * @param {Buffer} head
+   * @param {Object} options
+   */
+  setSocket(socket, head, option) {}
 }
 
 module.exports = YuFlux;
@@ -149,13 +163,72 @@ const initWebSocketClient = (websocket, address, protocols, options) => {
   req.on("error", (err) => {
     req = websocket._req = null;
 
-    emitErrorAndClose();
+    emitErrorAndClose(websocket, err);
   });
 
   //todo respose 重定向
 
   req.on("upgrade", (res, socket, head) => {
     websocket.emit("upgrade", res);
+
+    if (websocket._readyState !== readyStates[0]) {
+      return;
+    }
+    //http请求回来了，就置空req
+    req = websocket._req = null;
+
+    const upgrade = res.headers.upgrade;
+    // console.log(res.headers, "res.headers");
+    //请求头不对
+    if (upgrade === undefined || upgrade.toLowerCase() !== "websocket") {
+      abortHandshake(websocket, socket, "不正确的请求头");
+      return;
+    }
+
+    //解密,使用sha1算法
+    //定义GUID（全局唯一标识符）摘要，可以是一个固定值或动态生成，从而生成摘要，最终转化成base64
+    const digest = createHash("sha1")
+      .update(key + GUID)
+      .digest("base64");
+
+    if (res.headers["sec-websocket-accept"] !== digest) {
+      abortHandshake(websocket, socket, "不正确的 sec-websocket-key 请求头");
+      return;
+    }
+
+    //子协议的处理
+    const serverProtocol = res.headers["sec-websocket-protocol"];
+    let protocolError;
+
+    if (serverProtocol !== undefined) {
+      //todo 更细的error划分
+      protocolError = "暂不支持子协议";
+    }
+
+    if (protocolError) {
+      abortHandshake(websocket, socket, protocolError);
+      return;
+    }
+
+    if (serverProtocol) websocket._protocol = serverProtocol;
+
+    //处理sec-websocket-extensions,扩展
+    const secWebSocketExtensions = res.headers["sec-websocket-extensions"];
+    if (secWebSocketExtensions !== undefined) {
+      //todo 更细的error划分
+      const message = "暂不支持websocket扩展协议";
+      abortHandshake(websocket, socket, message);
+      return;
+    }
+
+    //握手结束，正式tcp连接（socket）
+    //setSocket
+    websocket.setSocket(socket, head, {
+      allowSynchronousEvents: opts.allowSynchronousEvents,
+      generateMask: opts.generateMask,
+      maxPayload: opts.maxPayload,
+      skipUTF8Validation: opts.skipUTF8Validation,
+    });
   });
 
   if (opts.finishRequest) {
@@ -166,6 +239,16 @@ const initWebSocketClient = (websocket, address, protocols, options) => {
 };
 
 //todo 完善 emitErrorAndClose 函数
-const emitErrorAndClose = (err) => {
-  console.error(err, "err");
+/**
+ * @param {websocket} websocket websocket实例
+ * @param {*} err
+ *
+ */
+const emitErrorAndClose = (websocket, err) => {
+  //1. 改变websocket的状态
+  websocket._readyState = readyStates[3];
+  //2. emit error
+  websocket.emit("error", err);
+  //3. 真正的emitClose函数
+  websocket.emitClose();
 };
