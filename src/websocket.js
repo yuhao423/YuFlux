@@ -97,7 +97,7 @@ const initWebSocketClient = (websocket, address, protocols, options) => {
   const defaultPort = isSecure ? 443 : 80;
   opts.port = parseUrl.port || defaultPort;
   //处理ipv6
-  opts.host = parseUrl.host.startsWith("[") ? parseUrl.host.slice(1, -1) : parseUrl.host;
+  opts.host = parseUrl.host.startsWith("[") ? parseUrl.hostName.slice(1, -1) : parseUrl.hostName;
   //请求头
   opts.headers = {
     ...opts.headers,
