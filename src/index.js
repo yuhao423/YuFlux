@@ -1,4 +1,7 @@
 "use strict";
-const a = 3;
-const map = new Map();
-map.set("s", a);
+const YuFlux = require("./websocket");
+
+const yuFlux = new YuFlux("http://localhost:8000");
+yuFlux.on("upgrade", (res, socket, head) => {
+  console.error("res.headers");
+});

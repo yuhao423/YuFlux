@@ -5,6 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev":"node src/index.js",
+    "test": "node test/index.js",
     "lint": "eslint \"src/*.{js,ts,cjs,json}\" --fix",
     "format": "prettier --write \"src/*.{ts,js,cjs,mjs,json}\"",
     "typecheck": "tsc --noEmit",
