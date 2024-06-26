@@ -35,8 +35,31 @@ class YuFlux extends EventEmitter {
    * @param {Duplex} socket
    * @param {Buffer} head
    * @param {Object} options
+   *
    */
-  setSocket(socket, head, option) {}
+  setSocket(socket, head, option) {
+    //1. receiver
+
+    //2. sender
+
+    //3.socket
+    this._socket = socket;
+
+    socket["kWebsocket"] = this;
+
+    //socket相关
+    if (socket.setTimeout) socket.setTimeout(0);
+    if (socket.setNoDelay) socket.setNoDelay();
+
+    if (head.length > 0) socket.unshift(head);
+
+    //todo socket其他事件的监听
+    socket.on("data", socketOnData);
+
+    //内部状态
+    this._readyState = readyStates[1];
+    this.emit("open");
+  }
 }
 
 module.exports = YuFlux;
@@ -252,3 +275,14 @@ const emitErrorAndClose = (websocket, err) => {
   //3. 真正的emitClose函数
   websocket.emitClose();
 };
+
+/**
+ * @private
+ */
+function socketOnData(chunk) {
+  //this 是socket实例
+  //this['kWebsocket']是 websocket 实例
+  if (!this["kWebsocket"]._receiver.write(chunk)) {
+    this.pause();
+  }
+}
