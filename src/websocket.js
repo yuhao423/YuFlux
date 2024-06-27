@@ -3,7 +3,7 @@ const EventEmitter = require("events");
 const { URL } = require("url");
 const { randomBytes, createHash } = require("crypto");
 
-const { protocolVersions, readyStates, GUID } = require("./constant");
+const { protocolVersions, readyStates, GUID, emptyBuffer } = require("./constant");
 
 class YuFlux extends EventEmitter {
   constructor(address, protocols, options) {
@@ -59,6 +59,39 @@ class YuFlux extends EventEmitter {
     //内部状态
     this._readyState = readyStates[1];
     this.emit("open");
+  }
+
+  /**
+   * @param {*} data
+   * @param {Object} [options]
+   * @param {Function} [cb]
+   * @public
+   */
+  send(data, options, cb) {
+    //1.
+    if (this._readyState !== readyStates[1]) {
+      throw new Error("yuflux 内部状态不是opening状态，不可发送消息");
+    }
+
+    //todo send after close
+
+    if (typeof data === "number") data = data.toString();
+
+    //利于交互
+    if (typeof options === "function") {
+      cb = options;
+      options = {};
+    }
+
+    const opts = {
+      binary: typeof data !== "string", //是不是
+      mask: !this._isServer, //客户端必须要掩码
+      fin: true, //是否是最后一个
+      compress: true, //是否压缩，这里暂时为false
+      ...options,
+    };
+
+    this._sender.send(data || emptyBuffer, opts, cb);
   }
 }
 

@@ -9,7 +9,7 @@ wsServer.on('connection',(ws)=>{
       console.error('received: %s', data);
     });
   
-    ws.send('something');
+    // ws.send('something');
 })
 
 module.exports = wsServer

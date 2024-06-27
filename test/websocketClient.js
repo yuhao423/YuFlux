@@ -16,6 +16,13 @@ wsClient.on('open', function open() {
   wsClient.send('yuyu',()=>{
     console.error('我发送了');
   });
+
+  setTimeout(()=>{
+    wsClient.send('yuyu1',()=>{
+      console.error('我发送了2');
+    });
+  },2000)
+
 });
 
 wsClient.on('message',(message)=>{
