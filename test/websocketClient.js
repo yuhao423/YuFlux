@@ -13,12 +13,19 @@ wsClient.on('open', function open() {
     array[i] = i / 2;
   }
 
-  wsClient.send('yuyu',()=>{
-    console.error('我发送了');
+  wsClient.send('yuyu',{
+   
+  },()=>{
+    console.log('我发送了1');
   });
 
+  let a = []
+  for(let i = 0;i<200;i++){
+    a.push(3)
+  }
+  const longString = a.join('')
   setTimeout(()=>{
-    wsClient.send('yuyu1',()=>{
+    wsClient.send(longString,()=>{
       console.error('我发送了2');
     });
   },2000)

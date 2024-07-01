@@ -3,13 +3,14 @@ const EventEmitter = require("events");
 const { URL } = require("url");
 const { randomBytes, createHash } = require("crypto");
 
+const Sender = require("./sender");
 const { protocolVersions, readyStates, GUID, emptyBuffer } = require("./constant");
 
 class YuFlux extends EventEmitter {
   constructor(address, protocols, options) {
     super();
     this._readyState = readyStates[0];
-
+    this._extensions = {};
     if (address !== undefined) {
       this._isServer = false;
       this._redirect = 0;
@@ -41,7 +42,7 @@ class YuFlux extends EventEmitter {
     //1. receiver
 
     //2. sender
-
+    this._sender = new Sender(socket, this._extensions, option.generateMask);
     //3.socket
     this._socket = socket;
 
